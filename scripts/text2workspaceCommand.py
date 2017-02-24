@@ -30,6 +30,7 @@ numbers = Numbers()
 def main():
 
     text2workspace( os.path.join( inputDir, 'CARD_all_orig.txt' ), importMuExpressions=True )
+
     text2workspace( os.path.join( inputDir, 'CARD_HWW.txt' ),      importMuExpressions=False )
     text2workspace( os.path.join( inputDir, 'CARD_Hgg.txt' ),      importMuExpressions=False )
     
@@ -48,9 +49,12 @@ def text2workspace( datacard, importMuExpressions, isHZZ=False ):
     cmd += os.path.abspath( datacard ) + ' '
     cmd += ' -o ' + os.path.abspath( datacard ).replace('.txt','.root') + ' '
 
-    cmd += ' -P TestModel:testModel '    
+    cmd += ' -P TestModel:testModel '
+
+    # Actually not physics, but can't think of a cleaner way
 
     if importMuExpressions:
+        cmd += '--PO expressionWS={0} '.format( os.path.join( inputDir, 'expressions.root' )  )
         cmd += '--PO importMuExpressions=True '
     else:
         cmd += '--PO importMuExpressions=False '

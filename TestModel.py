@@ -1,6 +1,7 @@
 
 from HiggsAnalysis.CombinedLimit.PhysicsModel import *
 
+import os
 import re
 import ROOT
 
@@ -69,6 +70,7 @@ class TestModel( PhysicsModel ):
             elif readOption( physOption, 'Hgg_nBins', type=int ): continue
             elif readOption( physOption, 'HZZ_nBins', type=int ): continue
             elif readOption( physOption, 'HWW_nBins', type=int ): continue
+            elif readOption( physOption, 'expressionWS', type=str ): continue
             elif readOption( physOption, 'importMuExpressions', type=bool ): continue
             elif readOption( physOption, 'isHZZ', type=bool ): continue
             elif readOption( physOption, 'mass' ): continue
@@ -138,14 +140,14 @@ class TestModel( PhysicsModel ):
         # Manually import objects from the input workspaces
         # This is STRONGLY against the designed workflow
 
-        # Get the filled input workspace
-        filledWsPath = '/afs/cern.ch/work/t/tklijnsm/Combinations/CMSSW_7_1_5/src/combination3/input/expressions.root'
-        filledWsFp = ROOT.TFile.Open( filledWsPath )
-        filledWs = filledWsFp.Get('w')
-
         if self.importMuExpressions:
 
-            print 'Importing premade expressions from ' + filledWsPath
+            # Get the filled input workspace
+            # filledWsPath = '/afs/cern.ch/work/t/tklijnsm/Combinations/CMSSW_7_1_5/src/combination3/input/expressions.root'
+            filledWsFp = ROOT.TFile.Open( self.expressionWS )
+            filledWs = filledWsFp.Get('w')
+
+            print 'Importing premade expressions from ' + self.expressionWS
 
             getattr( self.modelBuilder.out ,'import')(
                 filledWs.components(), ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence()
@@ -156,6 +158,8 @@ class TestModel( PhysicsModel ):
 
             for iBinFine in xrange(self.Fine_nBins):
                 POInames.append( 'FineBin{0}_Mu'.format(iBinFine) )
+
+            filledWsFp.Close()
 
 
         elif self.isHZZ:
@@ -226,8 +230,6 @@ class TestModel( PhysicsModel ):
 
                 POInames.append( "HWWBin{0}_Mu".format(iBin) )
 
-
-        filledWsFp.Close()
 
 
         # # ======================================
